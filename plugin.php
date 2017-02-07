@@ -288,6 +288,7 @@ class Bunch_Optimizer {
      */
     protected function create_bunch_file( $filename ) {
         if ( ! ( $fh = fopen( $this->assets_dir . $filename, 'w' ) ) ) {
+            // TODO: error_log ?
             return false;
         }
         
@@ -316,6 +317,7 @@ if ( !is_admin() ) {
         try {
             Bunch_Optimizer::get_instance()->setup();
         } catch ( RuntimeException $e ) {
+            // TODO: admin notice.
             error_log( $e->getMessage() );
         }
     } );
