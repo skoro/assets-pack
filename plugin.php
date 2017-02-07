@@ -110,10 +110,6 @@ class Bunch_Optimizer {
             return;
         }
         
-        if ( count( $load ) === 1 ) {
-            return;
-        }
-        
         $filename = $this->get_bunch_key( $handles ) . '.js';
         if ( !$this->is_bunch_exists( $filename ) &&
                 !$this->create_scripts_bunch( $filename, $load ) ) {
