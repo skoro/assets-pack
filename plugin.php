@@ -116,10 +116,10 @@ class Bunch_Optimizer {
         
         $filename = $this->get_bunch_key( $handles ) . '.js';
         if ( !$this->is_bunch_exists( $filename ) &&
-                !$this->create_bunch_file( $filename, $load ) ) {
+                !$this->create_scripts_bunch( $filename, $load ) ) {
             return;
         }
-        
+
         foreach ( $handles as $handle ) {
             $scripts->done[] = $handle;
             $scripts->print_extra_script( $handle );
@@ -139,7 +139,7 @@ class Bunch_Optimizer {
         $load = [];
         
         foreach ( $styles->to_do as $handle ) {
-            
+        
             if ( empty( $styles->registered[$handle] ) ) {
                 continue;
             }
@@ -168,7 +168,7 @@ class Bunch_Optimizer {
         
         $filename = $this->get_bunch_key( array_keys( $load ) ) . '.css';
         if ( !$this->is_bunch_exists( $filename ) &&
-                !$this->create_bunch_file( $filename, $load ) ) {
+                !$this->create_styles_bunch( $filename, $load ) ) {
             return;
         }
         
@@ -236,20 +236,15 @@ class Bunch_Optimizer {
     }
     
     /**
-     * Create bunch file.
+     * Create scripts bunch file.
      *
      * @param string $filename Base file name.
      * @param array $assets Assets in form: group - files.
      * @return bool 
      */
-    protected function create_bunch_file( $filename, array $assets ) {
-        if ( ! ( $fh = fopen( $this->assets_dir . $filename, 'w' ) ) ) {
-            // TODO: emit error.
-            return false;
-        }
+    protected function create_scripts_bunch( $filename, array $assets ) {
         
-        if ( !flock( $fh, LOCK_EX ) ) {
-            // Cannot lock file.
+        if ( ! ( $fh = $this->create_bunch_file( $filename ) ) ) {
             return false;
         }
         
@@ -257,14 +252,61 @@ class Bunch_Optimizer {
         
         foreach ( $assets as $group => $files ) {
             foreach ( (array) $files as $file ) {
-                $contents = file_get_contents( ABSPATH . $file );
+                $contents = file_get_contents( ABSPATH . $file ) . "\n\n;";
                 fwrite( $fh, $contents );
             }
         }
         
+        return $this->unlock_file( $fh );
+    }
+    
+    /**
+     * Create styles bunch file.
+     *
+     * @param string $filename
+     * @param array $files List of style files.
+     * @return bool
+     */
+    protected function create_styles_bunch( $filename, $files ) {
+        if ( ! ( $fh = $this->create_bunch_file( $filename ) ) ) {
+            return false;
+        }
+        
+        foreach ( $files as $file ) {
+            $contents = file_get_contents( ABSPATH . $file ) . "\n";
+            fwrite( $fh, $contents );
+        }
+        
+        return $this->unlock_file( $fh );
+    }
+    
+    /**
+     * Create and lock bunch file.
+     *
+     * @param string $filename
+     * @return bool Returns false on create error or file locked.
+     */
+    protected function create_bunch_file( $filename ) {
+        if ( ! ( $fh = fopen( $this->assets_dir . $filename, 'w' ) ) ) {
+            return false;
+        }
+        
+        if ( !flock( $fh, LOCK_EX ) ) {
+            return false;
+        }
+        
+        return $fh;
+    }
+    
+    /**
+     * Unlock file handle.
+     *
+     * @param resource $fh
+     * @return bool
+     */
+    protected function unlock_file( $fh ) {
         flock( $fh, LOCK_UN );
         fclose( $fh );
-        
         return true;
     }
 }
