@@ -9,7 +9,20 @@ Author URI:
 License: GPLv2
 */
 
+// Make sure we don't expose any info if it called directly.
+if ( ! defined( 'ABSPATH' ) ) {
+    die();
+}
+
+use MatthiasMullie\Minify;
+
+/**
+ * Scripts and styles optimizer.
+ */
 class Bunch_Optimizer {
+    
+    const MIN_JS = 1;
+    const MIN_CSS = 2;
     
     /**
      * @var Script_Minimizer
@@ -248,8 +261,14 @@ class Bunch_Optimizer {
         
         foreach ( $assets as $group => $files ) {
             foreach ( (array) $files as $file ) {
-                $contents = file_get_contents( ABSPATH . $file ) . "\n\n;";
-                fwrite( $fh, $contents );
+                $file_path = ABSPATH . $file;
+                // Skip already minified bundles.
+                if ( substr( $file_path, -7 ) === '.min.js' ) {
+                    $contents = file_get_contents( $file_path );
+                } else {
+                    $contents = $this->minify( $file_path, static::MIN_JS );
+                }
+                fwrite( $fh, $contents . "\n\n;" );
             }
         }
         
@@ -269,7 +288,13 @@ class Bunch_Optimizer {
         }
         
         foreach ( $files as $file ) {
-            $contents = file_get_contents( ABSPATH . $file ) . "\n";
+            $file_path = ABSPATH . $file;
+            // Skip already minified bundles.
+            if ( substr( $file_path, -8 ) === '.min.css' ) {
+                $contents = file_get_contents( $file_path ) . "\n";
+            } else {
+                $contents = $this->minify( $file_path, static::MIN_CSS );
+            }
             fwrite( $fh, $contents );
         }
         
@@ -306,9 +331,44 @@ class Bunch_Optimizer {
         fclose( $fh );
         return true;
     }
+    
+    /**
+     * Minify bunch.
+     *
+     * @param string $file
+     * @param integer $min
+     * @return string
+     * @throws InvalidArgumentException
+     */
+    protected function minify( $file, $min ) {
+        switch ( $min ) {
+            case static::MIN_JS :
+                $minify = new Minify\JS( $file );
+                break;
+            
+            case static::MIN_CSS:
+                $minify = new Minify\CSS( $file );
+                break;
+            
+            default:
+                throw new InvalidArgumentException('Minify id is unknown');
+        }
+        
+        return $minify->minify();
+    }
 }
 
+// Frontend part.
 if ( !is_admin() ) {
+
+    // Include Composer's autoloader.
+    if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
+        require_once $composer;
+    } else {
+        wp_die( __( 'Composer dependencies are missing. Please make sure that you are executed <strong>composer install</strong> command.' ) );
+    }
+
+    // Setup optimizer.
     add_action( 'plugins_loaded', function () {
         try {
             Bunch_Optimizer::get_instance()->setup();
