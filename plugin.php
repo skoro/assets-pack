@@ -113,6 +113,9 @@ class Bunch_Optimizer {
                     continue;
                 }
             }
+            if ( ( $pos = strpos( $src, '?' ) ) !== false ) {
+                $src = substr( $src, 0, $pos );
+            }
             
             $group = isset( $obj->extra['group'] ) ? $obj->extra['group'] : 0;
             $load[$group][] = $src;
