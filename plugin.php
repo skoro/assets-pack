@@ -94,6 +94,7 @@ class Bunch_Optimizer {
                 continue;
             }
             
+            /** @var $obj _WP_Dependency */
             $obj = $scripts->registered[$handle];
             $src = $obj->src;
             
@@ -105,18 +106,10 @@ class Bunch_Optimizer {
                 continue;
             }
             
-            if ( $src[0] !== '/' ) {
-                if ( strpos( $src, $this->base_url ) === 0 ) {
-                    $src = str_replace( $this->base_url, '', $src );
-                } else {
-                    // It's a remote script.
-                    continue;
-                }
+            if ( ( $src = $this->get_dependency_src( $obj ) ) === false ) {
+                continue;
             }
-            if ( ( $pos = strpos( $src, '?' ) ) !== false ) {
-                $src = substr( $src, 0, $pos );
-            }
-            
+
             $group = isset( $obj->extra['group'] ) ? $obj->extra['group'] : 0;
             $load[$group][] = $src;
             $handles[] = $handle;
@@ -156,10 +149,11 @@ class Bunch_Optimizer {
                 continue;
             }
             
+            /** @var $obj _WP_Dependency */
             if ( ! ( $obj = $styles->registered[$handle] ) ) {
                 continue;
             }
-            if ( strpos( $obj->src, $this->base_url ) !== 0 ) {
+            if ( ( $src = $this->get_dependency_src( $obj ) ) === false ) {
                 continue;
             }
             
@@ -167,7 +161,7 @@ class Bunch_Optimizer {
                 continue;
             }
             
-            $load[$handle] = str_replace( $this->base_url, '', $obj->src );
+            $load[$handle] = $src;
         }
         
         if ( empty( $load ) ) {
@@ -201,6 +195,33 @@ class Bunch_Optimizer {
      */
     protected function is_conditional( $obj ) {
         return isset( $obj->extra['conditional'] ) && $obj->extra['conditional'];
+    }
+    
+    /**
+     * Get dependency source without host name.
+     *
+     * @param _WP_Dependency $obj
+     * @return string|false
+     */
+    protected function get_dependency_src( $obj ) {
+        $src = $obj->src;
+        
+        if ( $src[0] === '/' ) {
+            return $src;
+        }
+        
+        // Remote resource.
+        if ( strpos( $src, $this->base_url) !== 0 ) {
+            return false;
+        }
+        
+        // Strip base url and GET parameters from url.
+        $src = str_replace( $this->base_url, '', $src );
+        if ( ( $pos = strpos( $src, '?' ) ) !== false ) {
+            $src = substr( $src, 0, $pos );
+        }
+
+        return $src;
     }
     
     /**
