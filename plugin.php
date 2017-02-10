@@ -47,6 +47,13 @@ class Bunch_Optimizer {
      * @var string
      */
     public $base_url;
+    
+    /**
+     * Scripts collected by {@see Bunch_Optimizer::wp_print_scripts}.
+     *
+     * @var array
+     */
+    public $scripts_bunch = [];
 
     /**
      * Disable class creation via constructor.
@@ -73,8 +80,10 @@ class Bunch_Optimizer {
      */
     public function setup() {
         if ( !is_admin() ) {
-            add_action( 'wp_print_scripts', [$this, 'wp_print_scripts' ], 100 );
+            add_action( 'wp_print_scripts', [$this, 'wp_print_scripts'], 100 );
             add_action( 'wp_print_styles', [$this, 'wp_print_styles'], 100 );
+            // Must be first.
+            add_action( 'wp_print_footer_scripts', [$this, 'wp_print_footer_scripts'], -100 );
         }
     }
     
@@ -86,7 +95,6 @@ class Bunch_Optimizer {
         $scripts->all_deps( $scripts->queue );
   
         $load = [];
-        $handles = [];
         
         foreach ( $scripts->to_do as $handle ) {
             
@@ -97,7 +105,13 @@ class Bunch_Optimizer {
             /** @var $obj _WP_Dependency */
             $obj = $scripts->registered[$handle];
             $src = $obj->src;
-            
+            $group = isset( $obj->extra['group'] ) ? $obj->extra['group'] : 0;
+
+            // Skip already bunched script.
+            if ( isset( $this->scripts_bunch[$group][$handle] ) ) {
+                continue;
+            }
+
             if ( empty( $src ) ) {
                 continue;
             }
@@ -110,24 +124,41 @@ class Bunch_Optimizer {
                 continue;
             }
 
-            $group = isset( $obj->extra['group'] ) ? $obj->extra['group'] : 0;
-            $load[$group][] = $src;
-            $handles[] = $handle;
+            $load[$group][$handle] = $src;
         }
 
         if ( empty( $load ) ) {
             return;
         }
+
+        // Sort by group order.
+        ksort( $load );
+        
+        foreach ( $load as $group => $handles) {
+            foreach ( $handles as $handle => $src ) {
+                $scripts->done[] = $handle;
+                // TODO: enqueue ?
+                $scripts->print_extra_script( $handle );
+                $this->scripts_bunch[$group][$handle] = $src;
+            }
+        }
+    }
+    
+    /**
+     * Callback handler for 'wp_print_footer_scripts' action.
+     */
+    public function wp_print_footer_scripts() {
+        $this->wp_print_scripts();
+        
+        $handles = [];
+        foreach ( $this->scripts_bunch as $group ) {
+            $handles = array_merge( $handles, array_keys( $group ) );
+        }
         
         $filename = $this->get_bunch_key( $handles ) . '.js';
         if ( !$this->is_bunch_exists( $filename ) &&
-                !$this->create_scripts_bunch( $filename, $load ) ) {
+                !$this->create_scripts_bunch( $filename, $this->scripts_bunch ) ) {
             return;
-        }
-
-        foreach ( $handles as $handle ) {
-            $scripts->done[] = $handle;
-            $scripts->print_extra_script( $handle );
         }
         
         $url = $this->assets_url . $filename;
@@ -280,8 +311,6 @@ class Bunch_Optimizer {
         if ( ! ( $fh = $this->create_bunch_file( $filename ) ) ) {
             return false;
         }
-        
-        ksort( $assets );
         
         foreach ( $assets as $group => $files ) {
             foreach ( (array) $files as $file ) {
