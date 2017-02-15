@@ -10,9 +10,7 @@ License: GPLv2
 */
 
 // Make sure we don't expose any info if it called directly.
-if ( ! defined( 'ABSPATH' ) ) {
-    die();
-}
+defined( 'ABSPATH' ) or die();
 
 use MatthiasMullie\Minify;
 
@@ -296,6 +294,7 @@ class Bunch_Optimizer {
      * @return bool
      */
     protected function is_bunch_exists( $filename ) {
+        return true;
         return file_exists( $this->assets_dir . $filename );
     }
     
