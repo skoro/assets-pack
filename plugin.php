@@ -23,7 +23,7 @@ class Bunch_Optimizer {
     const MIN_CSS = 2;
     
     /**
-     * @var Script_Minimizer
+     * @var Bunch_Optimizer
      */
     protected static $instance;
     
@@ -64,7 +64,7 @@ class Bunch_Optimizer {
     }
     
     /**
-     * @return Script_Minimizer
+     * @return Bunch_Optimizer
      */
     public static function get_instance() {
         if ( static::$instance === null ) {
@@ -294,7 +294,6 @@ class Bunch_Optimizer {
      * @return bool
      */
     protected function is_bunch_exists( $filename ) {
-        return true;
         return file_exists( $this->assets_dir . $filename );
     }
     
