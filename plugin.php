@@ -429,3 +429,8 @@ if ( !is_admin() ) {
         }
     } );
 }
+// Admin settings page.
+else {
+    require_once __DIR__ . '/admin.php';
+    Bunch_Optimizer_Admin::get_instance()->setup();
+}
