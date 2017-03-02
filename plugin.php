@@ -5,7 +5,7 @@ Plugin URI: https://github.com/skoro/bunch-optimizer
 Description: Minimize scripts and styles.
 Version: 0.1.0
 Author: Skorobogatko Alexei
-Author URI: 
+Author URI: https://github.com/skoro
 License: GPLv2
 */
 
