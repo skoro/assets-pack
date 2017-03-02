@@ -12,6 +12,8 @@ License: GPLv2
 // Make sure we don't expose any info if it called directly.
 defined( 'ABSPATH' ) or die();
 
+require_once __DIR__ . '/admin.php';
+
 use MatthiasMullie\Minify;
 
 /**
@@ -52,6 +54,11 @@ class Bunch_Optimizer {
      * @var array
      */
     public $scripts_bunch = [];
+    
+    /**
+     * @var Bunch_Optimizer_Admin
+     */
+    public $admin;
 
     /**
      * Disable class creation via constructor.
@@ -60,6 +67,7 @@ class Bunch_Optimizer {
      */
     private function __construct() {
         $this->base_url = home_url();
+        $this->admin = Bunch_Optimizer_Admin::get_instance();
         $this->init_assets_dir();
     }
     
@@ -77,11 +85,13 @@ class Bunch_Optimizer {
      * Setup WP actions.
      */
     public function setup() {
-        if ( !is_admin() ) {
+        if ( $this->admin->get_setting( 'enable_js') ) {
             add_action( 'wp_print_scripts', [$this, 'wp_print_scripts'], 100 );
-            add_action( 'wp_print_styles', [$this, 'wp_print_styles'], 100 );
             // Must be first.
             add_action( 'wp_print_footer_scripts', [$this, 'wp_print_footer_scripts'], -100 );
+        }
+        if ( $this->admin->get_setting( 'enable_css' ) ) {
+            add_action( 'wp_print_styles', [$this, 'wp_print_styles'], 100 );
         }
     }
     
@@ -431,6 +441,5 @@ if ( !is_admin() ) {
 }
 // Admin settings page.
 else {
-    require_once __DIR__ . '/admin.php';
     Bunch_Optimizer_Admin::get_instance()->setup();
 }
