@@ -56,10 +56,11 @@ class Bunch_Optimizer_Admin {
      */
     public function init_settings() {
 
+        $upload_dir = wp_upload_dir();
         register_setting( 'bw_optimizer', 'bw_optimizer', [
             'sanitize_callback' => [$this, 'validate_settings'],
             'default' => [
-                'assets' => '/wp-content/uploads/assets',
+                'assets' => $upload_dir['basedir'] . '/assets',
                 'enable_js' => false,
                 'debug_js' => false,
                 'enable_css' => false,
@@ -125,7 +126,10 @@ class Bunch_Optimizer_Admin {
     <?php }
     
     public function field_assets_store() { ?>
-        <input type="text" name="bw_optimizer[assets]" value="<?= $this->get_setting( 'assets' ) ?>" />
+        <input type="text" name="bw_optimizer[assets]" value="<?= $this->get_setting( 'assets' ) ?>" size="64"/>
+        <p>
+            <button name="clear" class="button">Clear assets</button>
+        </p>
     <?php }
     
     /**
@@ -135,6 +139,12 @@ class Bunch_Optimizer_Admin {
      * @return array Sanitized settings.
      */
     public function validate_settings( $settings ) {
+        if ( isset( $_POST['clear'] ) ) {
+            $this->clear_assets();
+            add_settings_error( 'assets', 'assets', 'Assets clean', 'updated' );
+            return $this->get_setting();
+        }
+        
         $settings['enable_js'] = !empty( $settings['enable_js'] );
         $settings['debug_js'] = !empty( $settings['debug_js'] );
         $settings['enable_css'] = !empty( $settings['enable_css'] );
@@ -148,9 +158,12 @@ class Bunch_Optimizer_Admin {
             add_settings_error( 'debug_css', 'debug_css', 'Css debug is useless when css aggregation is disabled.' );
         }
 
-        if ( !$this->validate_assets_dir( $settings['assets'] ) ) {
+        $dir = $this->validate_assets_dir( $settings['assets'] );
+        if ( $dir === false ) {
             $settings['assets'] = $this->get_setting( 'assets' );
             add_settings_error( 'assets', 'assets', 'Could not create directory or directory is not writeable.' );
+        } else {
+            $settings['assets'] = $dir;
         }
 
         return $settings;
@@ -160,24 +173,61 @@ class Bunch_Optimizer_Admin {
      * Validate assets directory.
      *
      * @param string $dir Directory.
-     * @return bool
+     * @return string|false Full directory path or false if cannot create
+     *                      directory or directory is not writable.
      */
     protected function validate_assets_dir( $dir ) {
         // TODO: normalize path.
-        $dir = ABSPATH . $dir;
         if ( !is_dir( $dir ) && !mkdir( $dir ) ) {
             return false;
         }
         if ( !is_writable( $dir ) ) {
             return false;
         }
-        return true;
+        return $dir;
     }
-    
-    public function get_setting( $field, $default = false ) {
+
+    /**
+     * Get setting field value.
+     *
+     * @param string $field Optional. Field name.
+     * @param mixed $default
+     * @return mixed
+     */
+    public function get_setting( $field = null, $default = false ) {
+
         if ( empty( $this->settings ) ) {
             $this->settings = get_option( 'bw_optimizer' );
         }
+
+        if ( $field === null ) {
+            return $this->settings;
+        }
+
         return isset( $this->settings[$field] ) ? $this->settings[$field] : $default;
+    }
+    
+    /**
+     * Clears asset files.
+     *
+     * @param string $dir Assets dir.
+     * @return bool
+     */
+    public function clear_assets( $dir = null ) {
+        if ( $dir === null ) {
+            $dir = $this->get_setting( 'assets' );
+        }
+        
+        $success = true;
+        $pattern = $dir . DIRECTORY_SEPARATOR . '*.{js,css}';
+        $files = glob( $pattern, GLOB_BRACE | GLOB_NOSORT );
+        
+        foreach ( $files as $file ) {
+            if ( !unlink( $file ) ) {
+                $success = false;
+            }
+        }
+        
+        return $success;
     }
 }
