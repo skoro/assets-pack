@@ -176,7 +176,11 @@ class Bunch_Optimizer_Admin {
      * @return string|false Full directory path or false if cannot create
      *                      directory or directory is not writable.
      */
-    protected function validate_assets_dir( $dir ) {
+    public function validate_assets_dir( $dir = null ) {
+        if ( $dir === null ) {
+            $dir = $this->get_setting( 'assets' );
+        }
+        
         // TODO: normalize path.
         if ( !is_dir( $dir ) && !mkdir( $dir ) ) {
             return false;
