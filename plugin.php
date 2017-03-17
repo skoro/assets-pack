@@ -286,16 +286,14 @@ class Bunch_Optimizer {
      * @throws RuntimeException When assets directory cannot be created.
      */
     protected function init_assets_dir() {
-        // TODO: refactor with admin::validate_assets_dir().
-        $upload = wp_upload_dir();
-        $dir = $upload['basedir'] . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR;
+        $dir = $this->admin->get_setting( 'assets_dir' );
         
-        if ( !is_dir( $dir ) && !mkdir( $dir ) ) {
+        if ( $this->admin->validate_assets_dir() === false ) {
             throw new RuntimeException( 'Cannot create assets directory: ' . $dir );
         }
         
         $this->assets_dir = $dir;
-        $this->assets_url = $upload['baseurl'] . '/assets/';
+        $this->assets_url = $this->admin->get_setting( 'assets_url' );
     }
     
     /**
