@@ -418,9 +418,16 @@ class Bunch_Optimizer {
     }
 }
 
-// Frontend part.
-if ( !is_admin() ) {
+//===========================================================================
+// Plugin starts here.
+//===========================================================================
 
+// Admin settings page.
+if ( is_admin() ) {
+    Bunch_Optimizer_Admin::get_instance()->setup();
+}
+// Frontend part.
+else {
     // Include Composer's autoloader.
     if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
         require_once $composer;
@@ -437,8 +444,4 @@ if ( !is_admin() ) {
             error_log( $e->getMessage() );
         }
     } );
-}
-// Admin settings page.
-else {
-    Bunch_Optimizer_Admin::get_instance()->setup();
 }
