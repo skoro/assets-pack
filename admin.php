@@ -60,7 +60,8 @@ class Bunch_Optimizer_Admin {
         register_setting( 'bw_optimizer', 'bw_optimizer', [
             'sanitize_callback' => [$this, 'validate_settings'],
             'default' => [
-                'assets' => $upload_dir['basedir'] . '/assets',
+                'assets_dir' => $upload_dir['basedir'] . '/assets',
+                'assets_url' => $upload_dir['baseurl'] . '/assets',
                 'enable_js' => false,
                 'debug_js' => false,
                 'enable_css' => false,
@@ -70,7 +71,8 @@ class Bunch_Optimizer_Admin {
 
         // Main options.
         add_settings_section( 'main', '', '__return_false', $this->settings_page );
-        add_settings_field( 'assets', 'Assets store location', [$this, 'field_assets_store'], $this->settings_page, 'main' );
+        add_settings_field( 'assets_dir', 'Assets store location', [$this, 'field_assets_store'], $this->settings_page, 'main' );
+        add_settings_field( 'assets_url', 'Assets URL', [$this, 'field_assets_url'], $this->settings_page, 'main' );
         
         // Javascript options.
         add_settings_section( 'js', 'JavaScript aggregation', '__return_false', $this->settings_page );
@@ -126,10 +128,14 @@ class Bunch_Optimizer_Admin {
     <?php }
     
     public function field_assets_store() { ?>
-        <input type="text" name="bw_optimizer[assets]" value="<?= $this->get_setting( 'assets' ) ?>" size="64"/>
+        <input type="text" name="bw_optimizer[assets_dir]" value="<?= $this->get_setting( 'assets_dir' ) ?>" size="64"/>
         <p>
             <button name="clear" class="button">Clear assets</button>
         </p>
+    <?php }
+    
+    public function field_assets_url() { ?>
+        <input type="text" name="bw_optimizer[assets_url]" value="<?= $this->get_setting( 'assets_url' ) ?>" size="64"/>
     <?php }
     
     /**
@@ -141,7 +147,7 @@ class Bunch_Optimizer_Admin {
     public function validate_settings( $settings ) {
         if ( isset( $_POST['clear'] ) ) {
             $this->clear_assets();
-            add_settings_error( 'assets', 'assets', 'Assets clean', 'updated' );
+            add_settings_error( 'assets_dir', 'success', 'Assets clean.', 'updated' );
             return $this->get_setting();
         }
         
@@ -158,13 +164,16 @@ class Bunch_Optimizer_Admin {
             add_settings_error( 'debug_css', 'debug_css', 'Css debug is useless when css aggregation is disabled.' );
         }
 
-        $dir = $this->validate_assets_dir( $settings['assets'] );
+        $dir = $this->validate_assets_dir( $settings['assets_dir'] );
         if ( $dir === false ) {
-            $settings['assets'] = $this->get_setting( 'assets' );
-            add_settings_error( 'assets', 'assets', 'Could not create directory or directory is not writeable.' );
+            $settings['assets_dir'] = $this->get_setting( 'assets_dir' );
+            add_settings_error( 'assets_dir', 'error', 'Could not create directory or directory is not writeable.' );
         } else {
-            $settings['assets'] = $dir;
+            $settings['assets_dir'] = $dir;
         }
+        
+        // TODO: needs to be proper url validating.
+        $settings['assets_url'] = rtrim( $settings['assets_url'], '/' ) . '/';
 
         return $settings;
     }
@@ -178,7 +187,7 @@ class Bunch_Optimizer_Admin {
      */
     public function validate_assets_dir( $dir = null ) {
         if ( $dir === null ) {
-            $dir = $this->get_setting( 'assets' );
+            $dir = $this->get_setting( 'assets_dir' );
         }
         
         // TODO: normalize path.
@@ -188,7 +197,8 @@ class Bunch_Optimizer_Admin {
         if ( !is_writable( $dir ) ) {
             return false;
         }
-        return $dir;
+        
+        return rtrim( $dir, DIRECTORY_SEPARATOR ) . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -219,13 +229,13 @@ class Bunch_Optimizer_Admin {
      */
     public function clear_assets( $dir = null ) {
         if ( $dir === null ) {
-            $dir = $this->get_setting( 'assets' );
+            $dir = $this->get_setting( 'assets_dir' );
         }
         
         $success = true;
-        $pattern = $dir . DIRECTORY_SEPARATOR . '*.{js,css}';
+        $pattern = $dir . '*.{js,css}';
         $files = glob( $pattern, GLOB_BRACE | GLOB_NOSORT );
-        
+
         foreach ( $files as $file ) {
             if ( !unlink( $file ) ) {
                 $success = false;
