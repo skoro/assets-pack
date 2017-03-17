@@ -2,7 +2,7 @@
 /*
 Plugin Name: Bunch Optimizer
 Plugin URI: https://github.com/skoro/bunch-optimizer
-Description: Minimize scripts and styles.
+Description: Aggregate and minimize javascripts and css.
 Version: 0.1.0
 Author: Skorobogatko Alexei
 Author URI: https://github.com/skoro
