@@ -233,7 +233,7 @@ class Bunch_Optimizer_Admin {
         }
         
         $success = true;
-        $pattern = $dir . '*.{js,css}';
+        $pattern = $dir . '*.{js,css,js.debug,css.debug}';
         $files = glob( $pattern, GLOB_BRACE | GLOB_NOSORT );
 
         foreach ( $files as $file ) {
