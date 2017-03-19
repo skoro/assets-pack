@@ -319,8 +319,9 @@ class Bunch_Optimizer {
             return false;
         }
         
+        $debug_data = [];
         foreach ( $assets as $group => $files ) {
-            foreach ( (array) $files as $file ) {
+            foreach ( (array) $files as $handle => $file ) {
                 $file_path = ABSPATH . $file;
                 // Skip already minified bundles.
                 if ( substr( $file_path, -7 ) === '.min.js' ) {
@@ -329,7 +330,12 @@ class Bunch_Optimizer {
                     $contents = $this->minify( $file_path, static::MIN_JS );
                 }
                 fwrite( $fh, $contents . "\n\n;" );
+                $debug_data[$handle] = $file;
             }
+        }
+        
+        if ( $this->admin->get_setting( 'debug_js' ) ) {
+        	$this->create_debug( $filename, $debug_data );
         }
         
         return $this->unlock_file( $fh );
@@ -356,6 +362,10 @@ class Bunch_Optimizer {
                 $contents = $this->minify( $file_path, static::MIN_CSS );
             }
             fwrite( $fh, $contents );
+        }
+        
+        if ( $this->admin->get_setting( 'debug_css') ) {
+        	$this->create_debug( $filename, $files );
         }
         
         return $this->unlock_file( $fh );
@@ -415,6 +425,27 @@ class Bunch_Optimizer {
         }
         
         return $minify->minify();
+    }
+    
+    /**
+     * Create debug file.
+     *
+     * @param string $filename Debug file name (full path without .debug extension).
+     * @param array $data Debug contents.
+     * @return bool
+     */
+    protected function create_debug( $filename, array $data ) {
+    	$filename .= '.debug';
+    	
+    	if ( ( $fh = $this->create_bunch_file( $filename ) ) === false ) {
+    		return false;
+    	}
+    	
+    	foreach ( $data as $handle => $file ) {
+    		fwrite( $fh, sprintf( "%s: %s\n", $handle, $file ) );
+    	}
+    	
+    	return $this->unlock_file( $fh );
     }
 }
 
