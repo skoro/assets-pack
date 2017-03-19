@@ -62,8 +62,10 @@ class Bunch_Optimizer_Admin {
             'default' => [
                 'assets_dir' => $upload_dir['basedir'] . '/assets',
                 'assets_url' => $upload_dir['baseurl'] . '/assets',
+            	'skip_js' => [],
                 'enable_js' => false,
                 'debug_js' => false,
+            	'skip_css' => [],
                 'enable_css' => false,
                 'debug_css' => false,
             ],
@@ -77,11 +79,13 @@ class Bunch_Optimizer_Admin {
         // Javascript options.
         add_settings_section( 'js', 'JavaScript aggregation', '__return_false', $this->settings_page );
         add_settings_field( 'enable_js', 'JS aggregation', [$this, 'field_enable_js'], $this->settings_page, 'js' );
+        add_settings_field( 'skip_js', 'Skip scripts', [$this, 'field_skip_js'], $this->settings_page, 'js' );
         add_settings_field( 'debug_js', 'Debug', [$this, 'field_debug_js'], $this->settings_page, 'js' );
         
         // CSS options.
         add_settings_section( 'css', 'CSS aggregation', '__return_false', $this->settings_page );
         add_settings_field( 'enable_css', 'CSS aggregation', [$this, 'field_enable_css'], $this->settings_page, 'css' );
+        add_settings_field( 'skip_css', 'Skip styles', [$this, 'field_skip_css'], $this->settings_page, 'css' );
         add_settings_field( 'debug_css', 'Debug', [$this, 'field_debug_css'], $this->settings_page, 'css' );
     }
     
@@ -99,11 +103,29 @@ class Bunch_Optimizer_Admin {
         </div>
     <?php }
     
+    public function field_skip_js() { ?>
+    	<input type="text" name="bw_optimizer[skip_js]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_js' ) ) ) ?>" size="64"/>
+    	<p class="description">
+            Do not include these scripts to assets file.
+            You should enter handle names separated by commas.
+            You can get names from a .js.debug file.
+        </p>
+    <?php }
+    
     public function field_enable_js() { ?>
         <label>
             <input type="checkbox" name="bw_optimizer[enable_js]" value="true" <?php checked( $this->get_setting( 'enable_js' ) ) ?>/>
             <?php esc_html_e( 'Enabling aggregation all javascripts will concatenated to one asset bundle.' ) ?>
         </label>
+    <?php }
+    
+    public function field_skip_css() { ?>
+        <input type="text" name="bw_optimizer[skip_css]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_css' ) ) ) ?>" size="64"/>
+        <p class="description">
+            Do not include these styles to assets file.
+            You should enter handle names separated by commas.
+            You can get names from a .css.debug file.
+        </p>
     <?php }
     
     public function field_enable_css() { ?>
@@ -174,6 +196,9 @@ class Bunch_Optimizer_Admin {
         
         // TODO: needs to be proper url validating.
         $settings['assets_url'] = rtrim( $settings['assets_url'], '/' ) . '/';
+        
+        $settings['skip_js'] = array_map( 'trim', explode( ',', $settings['skip_js'] ) );
+        $settings['skip_css'] = array_map( 'trim', explode( ',', $settings['skip_css'] ) );
 
         return $settings;
     }

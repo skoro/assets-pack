@@ -103,10 +103,16 @@ class Bunch_Optimizer {
         $scripts->all_deps( $scripts->queue );
   
         $load = [];
+        $skip = $this->admin->get_setting( 'skip_js' );
         
         foreach ( $scripts->to_do as $handle ) {
             
             if ( empty( $scripts->registered[$handle] ) ) {
+                continue;
+            }
+            
+            // Skip admin defined scripts.
+            if ( in_array( $handle, $skip ) ) {
                 continue;
             }
             
@@ -181,10 +187,16 @@ class Bunch_Optimizer {
         $styles->all_deps( $styles->queue );
         
         $load = [];
+        $skip = $this->admin->get_setting( 'skip_css' );
         
         foreach ( $styles->to_do as $handle ) {
         
             if ( empty( $styles->registered[$handle] ) ) {
+                continue;
+            }
+            
+            // Skip admin defined styles.
+            if ( in_array( $handle, $skip ) ) {
                 continue;
             }
             
