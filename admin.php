@@ -3,10 +3,10 @@
 /**
  * Administrative interface.
  */
-class Bunch_Optimizer_Admin {
+class Assets_Pack_Admin {
     
     /**
-     * @var Bunch_Optimizer_Admin
+     * @var Assets_Pack_Admin
      */
     protected static $instance;
     
@@ -21,7 +21,7 @@ class Bunch_Optimizer_Admin {
     protected $settings_page;
     
     /**
-     * @return Bunch_Optimizer_Admin
+     * @return Assets_Pack_Admin
      */
     public static function get_instance() {
         if ( static::$instance === null ) {
@@ -43,10 +43,10 @@ class Bunch_Optimizer_Admin {
      */
     public function admin_menu() {
         $this->settings_page = add_options_page(
-            'Bandwidth optimizer',
-            'Bandwidth',
-            apply_filters( 'bandwidth_settings_capability', 'manage_options' ),
-            'bw-settings',
+            'Assets Pack',
+            'Assets',
+            apply_filters( 'assets_settings_capability', 'manage_options' ),
+            'assets-settings',
             [$this, 'settings_page']
         );
     }
@@ -57,7 +57,7 @@ class Bunch_Optimizer_Admin {
     public function init_settings() {
 
         $upload_dir = wp_upload_dir();
-        register_setting( 'bw_optimizer', 'bw_optimizer', [
+        register_setting( 'assets_pack', 'assets_pack', [
             'sanitize_callback' => [$this, 'validate_settings'],
             'default' => [
                 'assets_dir' => $upload_dir['basedir'] . '/assets',
@@ -96,7 +96,7 @@ class Bunch_Optimizer_Admin {
         <div class="wrap">
             <h1>Bandwidth optimizer</h1>
             <form method="POST" action="options.php">
-                <?php settings_fields( 'bw_optimizer' ) ?>
+                <?php settings_fields( 'assets_pack' ) ?>
                 <?php do_settings_sections( $this->settings_page ) ?>
                 <?php submit_button( 'Update settings' ) ?>
             </form>
@@ -104,7 +104,7 @@ class Bunch_Optimizer_Admin {
     <?php }
     
     public function field_skip_js() { ?>
-    	<input type="text" name="bw_optimizer[skip_js]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_js' ) ) ) ?>" size="64"/>
+    	<input type="text" name="assets_pack[skip_js]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_js' ) ) ) ?>" size="64"/>
     	<p class="description">
             Do not include these scripts to assets file.
             You should enter handle names separated by commas.
@@ -114,13 +114,13 @@ class Bunch_Optimizer_Admin {
     
     public function field_enable_js() { ?>
         <label>
-            <input type="checkbox" name="bw_optimizer[enable_js]" value="true" <?php checked( $this->get_setting( 'enable_js' ) ) ?>/>
+            <input type="checkbox" name="assets_pack[enable_js]" value="true" <?php checked( $this->get_setting( 'enable_js' ) ) ?>/>
             <?php esc_html_e( 'Enabling aggregation all javascripts will concatenated to one asset bundle.' ) ?>
         </label>
     <?php }
     
     public function field_skip_css() { ?>
-        <input type="text" name="bw_optimizer[skip_css]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_css' ) ) ) ?>" size="64"/>
+        <input type="text" name="assets_pack[skip_css]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_css' ) ) ) ?>" size="64"/>
         <p class="description">
             Do not include these styles to assets file.
             You should enter handle names separated by commas.
@@ -130,34 +130,34 @@ class Bunch_Optimizer_Admin {
     
     public function field_enable_css() { ?>
         <label>
-            <input type="checkbox" name="bw_optimizer[enable_css]" value="true" <?php checked( $this->get_setting( 'enable_css' ) ) ?>/>
+            <input type="checkbox" name="assets_pack[enable_css]" value="true" <?php checked( $this->get_setting( 'enable_css' ) ) ?>/>
             <?php esc_html_e( 'Enabling aggregation all CSS styles will concatenated to one asset bundle.' ) ?>
         </label>
     <?php }
     
     public function field_debug_js() { ?>
         <label>
-            <input type="checkbox" name="bw_optimizer[debug_js]" value="true" <?php checked( $this->get_setting( 'debug_js') ) ?>/>
+            <input type="checkbox" name="assets_pack[debug_js]" value="true" <?php checked( $this->get_setting( 'debug_js') ) ?>/>
             <?php esc_html_e( 'Create along with js asset file with .js.debug extension which contains script names.' ) ?>
         </label>
     <?php }
     
     public function field_debug_css() { ?>
         <label>
-            <input type="checkbox" name="bw_optimizer[debug_css]" value="true" <?php checked( $this->get_setting( 'debug_css' ) ) ?>/>
+            <input type="checkbox" name="assets_pack[debug_css]" value="true" <?php checked( $this->get_setting( 'debug_css' ) ) ?>/>
             <?php esc_html_e( 'Create along with css asset file with .css.debug extension which contains styles names.' ) ?>
         </label>
     <?php }
     
     public function field_assets_store() { ?>
-        <input type="text" name="bw_optimizer[assets_dir]" value="<?= $this->get_setting( 'assets_dir' ) ?>" size="64"/>
+        <input type="text" name="assets_pack[assets_dir]" value="<?= $this->get_setting( 'assets_dir' ) ?>" size="64"/>
         <p>
             <button name="clear" class="button">Clear assets</button>
         </p>
     <?php }
     
     public function field_assets_url() { ?>
-        <input type="text" name="bw_optimizer[assets_url]" value="<?= $this->get_setting( 'assets_url' ) ?>" size="64"/>
+        <input type="text" name="assets_pack[assets_url]" value="<?= $this->get_setting( 'assets_url' ) ?>" size="64"/>
     <?php }
     
     /**
@@ -236,7 +236,7 @@ class Bunch_Optimizer_Admin {
     public function get_setting( $field = null, $default = false ) {
 
         if ( empty( $this->settings ) ) {
-            $this->settings = get_option( 'bw_optimizer' );
+            $this->settings = get_option( 'assets_pack' );
         }
 
         if ( $field === null ) {
