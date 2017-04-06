@@ -1,7 +1,7 @@
 <?php
 /*
-Plugin Name: Bunch Optimizer
-Plugin URI: https://github.com/skoro/bunch-optimizer
+Plugin Name: Assets Pack
+Plugin URI: https://github.com/skoro/assets-pack
 Description: Aggregate and minimize javascripts and css.
 Version: 0.1.0
 Author: Skorobogatko Alexei
@@ -19,13 +19,13 @@ use MatthiasMullie\Minify;
 /**
  * Scripts and styles optimizer.
  */
-class Bunch_Optimizer {
+class Assets_Pack {
     
     const MIN_JS = 1;
     const MIN_CSS = 2;
     
     /**
-     * @var Bunch_Optimizer
+     * @var Assets_Pack
      */
     protected static $instance;
     
@@ -49,30 +49,30 @@ class Bunch_Optimizer {
     public $base_url;
     
     /**
-     * Scripts collected by {@see Bunch_Optimizer::wp_print_scripts}.
+     * Scripts collected by {@see Assets_Pack::wp_print_scripts}.
      *
      * @var array
      */
-    public $scripts_bunch = [];
+    public $script_assets = [];
     
     /**
-     * @var Bunch_Optimizer_Admin
+     * @var Assets_Pack_Admin
      */
     public $admin;
 
     /**
      * Disable class creation via constructor.
      *
-     * @see Bunch_Optimizer::get_instance()
+     * @see Assets_Pack::get_instance()
      */
     private function __construct() {
         $this->base_url = home_url();
-        $this->admin = Bunch_Optimizer_Admin::get_instance();
+        $this->admin = Assets_Pack_Admin::get_instance();
         $this->init_assets_dir();
     }
     
     /**
-     * @return Bunch_Optimizer
+     * @return Assets_Pack
      */
     public static function get_instance() {
         if ( static::$instance === null ) {
@@ -121,8 +121,8 @@ class Bunch_Optimizer {
             $src = $obj->src;
             $group = isset( $obj->extra['group'] ) ? $obj->extra['group'] : 0;
 
-            // Skip already bunched script.
-            if ( isset( $this->scripts_bunch[$group][$handle] ) ) {
+            // Skip already handled scripts.
+            if ( isset( $this->script_assets[$group][$handle] ) ) {
                 continue;
             }
 
@@ -153,7 +153,7 @@ class Bunch_Optimizer {
                 $scripts->done[] = $handle;
                 // TODO: enqueue ?
                 $scripts->print_extra_script( $handle );
-                $this->scripts_bunch[$group][$handle] = $src;
+                $this->script_assets[$group][$handle] = $src;
             }
         }
     }
@@ -165,13 +165,13 @@ class Bunch_Optimizer {
         $this->wp_print_scripts();
         
         $handles = [];
-        foreach ( $this->scripts_bunch as $group ) {
+        foreach ( $this->script_assets as $group ) {
             $handles = array_merge( $handles, array_keys( $group ) );
         }
         
-        $filename = $this->get_bunch_key( $handles ) . '.js';
-        if ( !$this->is_bunch_exists( $filename ) &&
-                !$this->create_scripts_bunch( $filename, $this->scripts_bunch ) ) {
+        $filename = $this->get_assets_key( $handles ) . '.js';
+        if ( !$this->is_assets_exists( $filename ) &&
+                !$this->create_scripts_assets( $filename, $this->script_assets ) ) {
             return;
         }
         
@@ -223,14 +223,14 @@ class Bunch_Optimizer {
             return;
         }
         
-        $filename = $this->get_bunch_key( array_keys( $load ) ) . '.css';
-        if ( !$this->is_bunch_exists( $filename ) &&
-                !$this->create_styles_bunch( $filename, $load ) ) {
+        $filename = $this->get_assets_key( array_keys( $load ) ) . '.css';
+        if ( !$this->is_assets_exists( $filename ) &&
+                !$this->create_styles_assets( $filename, $load ) ) {
             return;
         }
         
         $url = $this->assets_url . $filename;
-        print "<link rel='stylesheet' id='bunch-css' href='$url' type='text/css' />\n";
+        print "<link rel='stylesheet' id='assets-css' href='$url' type='text/css' />\n";
 
         foreach ( array_keys( $load ) as $handle ) {
             $styles->done[] = $handle;
@@ -281,7 +281,7 @@ class Bunch_Optimizer {
      * @param array $handles
      * @return string
      */
-    protected function get_bunch_key( $handles ) {
+    protected function get_assets_key( $handles ) {
         
         $value = '';
         
@@ -309,25 +309,25 @@ class Bunch_Optimizer {
     }
     
     /**
-     * Is bunch file exist ?
+     * Is assets file exist ?
      *
      * @param string $filename Base file name.
      * @return bool
      */
-    protected function is_bunch_exists( $filename ) {
+    protected function is_assets_exists( $filename ) {
         return file_exists( $this->assets_dir . $filename );
     }
     
     /**
-     * Create scripts bunch file.
+     * Create scripts assets file.
      *
      * @param string $filename Base file name.
      * @param array $assets Assets in form: group - files.
      * @return bool 
      */
-    protected function create_scripts_bunch( $filename, array $assets ) {
+    protected function create_scripts_assets( $filename, array $assets ) {
         
-        if ( ! ( $fh = $this->create_bunch_file( $filename ) ) ) {
+        if ( ! ( $fh = $this->create_assets_file( $filename ) ) ) {
             return false;
         }
         
@@ -354,14 +354,14 @@ class Bunch_Optimizer {
     }
     
     /**
-     * Create styles bunch file.
+     * Create styles assets file.
      *
      * @param string $filename
      * @param array $files List of style files.
      * @return bool
      */
-    protected function create_styles_bunch( $filename, $files ) {
-        if ( ! ( $fh = $this->create_bunch_file( $filename ) ) ) {
+    protected function create_styles_assets( $filename, $files ) {
+        if ( ! ( $fh = $this->create_assets_file( $filename ) ) ) {
             return false;
         }
         
@@ -384,12 +384,12 @@ class Bunch_Optimizer {
     }
     
     /**
-     * Create and lock bunch file.
+     * Create and lock assets file.
      *
      * @param string $filename
      * @return bool Returns false on create error or file locked.
      */
-    protected function create_bunch_file( $filename ) {
+    protected function create_assets_file( $filename ) {
         if ( ! ( $fh = fopen( $this->assets_dir . $filename, 'w' ) ) ) {
             // TODO: error_log ?
             return false;
@@ -415,7 +415,7 @@ class Bunch_Optimizer {
     }
     
     /**
-     * Minify bunch.
+     * Minify assets.
      *
      * @param string $file
      * @param integer $min
@@ -449,7 +449,7 @@ class Bunch_Optimizer {
     protected function create_debug( $filename, array $data ) {
     	$filename .= '.debug';
     	
-    	if ( ( $fh = $this->create_bunch_file( $filename ) ) === false ) {
+    	if ( ( $fh = $this->create_assets_file( $filename ) ) === false ) {
     		return false;
     	}
     	
@@ -467,7 +467,7 @@ class Bunch_Optimizer {
 
 // Admin settings page.
 if ( is_admin() ) {
-    Bunch_Optimizer_Admin::get_instance()->setup();
+    Assets_Pack_Admin::get_instance()->setup();
 }
 // Frontend part.
 else {
@@ -481,7 +481,7 @@ else {
     // Setup optimizer.
     add_action( 'plugins_loaded', function () {
         try {
-            Bunch_Optimizer::get_instance()->setup();
+            Assets_Pack::get_instance()->setup();
         } catch ( RuntimeException $e ) {
             // TODO: admin notice.
             error_log( $e->getMessage() );
