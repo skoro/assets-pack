@@ -475,7 +475,7 @@ else {
     if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
         require_once $composer;
     } else {
-        wp_die( __( 'Composer dependencies are missing. Please make sure that you are executed <strong>composer install</strong> command.' ) );
+        wp_die( __( '"Assets Pack" plugin Composer dependencies are missing. Please make sure that you are executed <strong>composer install</strong> command.' ) );
     }
 
     // Setup optimizer.
