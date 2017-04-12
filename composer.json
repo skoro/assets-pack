@@ -3,7 +3,7 @@
     "license": "GPL-2.0+",
     "type" : "wordpress-plugin",
     "description": "This Wordpress plugin allows you to aggregate and minimize js scripts and css styles into assets file.",
-    "homepage": "https://github.com/skoro/bunch-optimizer",
+    "homepage": "https://github.com/skoro/assets-pack",
     "keywords": ["minimize", "aggregate", "assets", "js min", "css min"],
     "authors": [
         {
