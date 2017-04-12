@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8346062311385bdb1de8c8906f79fd31",
-    "content-hash": "2141d88cda5df76d8fccc087faab1638",
+    "content-hash": "59763630066f09f0167cb6fd7b749ba4",
     "packages": [
         {
             "name": "matthiasmullie/minify",
@@ -62,7 +61,7 @@
                 "minifier",
                 "minify"
             ],
-            "time": "2017-03-16 16:42:50"
+            "time": "2017-03-16T16:42:50+00:00"
         },
         {
             "name": "matthiasmullie/path-converter",
@@ -111,7 +110,7 @@
                 "paths",
                 "relative"
             ],
-            "time": "2017-01-26 08:54:49"
+            "time": "2017-01-26T08:54:49+00:00"
         }
     ],
     "packages-dev": [],
@@ -120,6 +119,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.6"
+    },
     "platform-dev": []
 }
