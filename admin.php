@@ -104,7 +104,7 @@ class Assets_Pack_Admin {
     <?php }
     
     public function field_skip_js() { ?>
-    	<input type="text" name="assets_pack[skip_js]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_js' ) ) ) ?>" size="64"/>
+    	<input type="text" name="assets_pack[skip_js]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_js', [] ) ) ) ?>" size="64"/>
     	<p class="description">
             Do not include these scripts to assets file.
             You should enter handle names separated by commas.
@@ -120,7 +120,7 @@ class Assets_Pack_Admin {
     <?php }
     
     public function field_skip_css() { ?>
-        <input type="text" name="assets_pack[skip_css]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_css' ) ) ) ?>" size="64"/>
+        <input type="text" name="assets_pack[skip_css]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_css', [] ) ) ) ?>" size="64"/>
         <p class="description">
             Do not include these styles to assets file.
             You should enter handle names separated by commas.
@@ -197,8 +197,12 @@ class Assets_Pack_Admin {
         // TODO: needs to be proper url validating.
         $settings['assets_url'] = rtrim( $settings['assets_url'], '/' ) . '/';
         
-        $settings['skip_js'] = array_map( 'trim', explode( ',', $settings['skip_js'] ) );
-        $settings['skip_css'] = array_map( 'trim', explode( ',', $settings['skip_css'] ) );
+        $settings['skip_js'] = array_filter(
+            array_map( 'trim', explode( ',', $settings['skip_js'] ) )
+        );
+        $settings['skip_css'] = array_filter(
+            array_map( 'trim', explode( ',', $settings['skip_css'] ) )
+        );
 
         return $settings;
     }
