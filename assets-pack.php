@@ -68,7 +68,6 @@ class Assets_Pack {
     private function __construct() {
         $this->base_url = home_url();
         $this->admin = Assets_Pack_Admin::get_instance();
-        $this->init_assets_dir();
     }
     
     /**
@@ -85,13 +84,17 @@ class Assets_Pack {
      * Setup WP actions.
      */
     public function setup() {
-        if ( $this->admin->get_setting( 'enable_js') ) {
+        if ( ( $js = $this->admin->get_setting( 'enable_js') ) ) {
             add_action( 'wp_print_scripts', [$this, 'wp_print_scripts'], 100 );
             // Must be first.
             add_action( 'wp_print_footer_scripts', [$this, 'wp_print_footer_scripts'], -100 );
         }
-        if ( $this->admin->get_setting( 'enable_css' ) ) {
+        if ( ( $css = $this->admin->get_setting( 'enable_css' ) ) ) {
             add_action( 'wp_print_styles', [$this, 'wp_print_styles'], 100 );
+        }
+        // Initialize directory only eigher js or css pack enabled.
+        if ( $js || $css ) {
+            $this->init_assets_dir();
         }
     }
     
