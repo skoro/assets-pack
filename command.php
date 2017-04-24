@@ -18,6 +18,7 @@ class Assets_Pack_Command extends WP_CLI_Command {
     protected $admin;
     
     public function __construct() {
+        parent::__construct();
         $this->admin = Assets_Pack_Admin::get_instance();
     }
     
