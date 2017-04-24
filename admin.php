@@ -94,7 +94,7 @@ class Assets_Pack_Admin {
      */
     public function settings_page() { ?>
         <div class="wrap">
-            <h1>Bandwidth optimizer</h1>
+            <h1>Assets pack</h1>
             <form method="POST" action="options.php">
                 <?php settings_fields( 'assets_pack' ) ?>
                 <?php do_settings_sections( $this->settings_page ) ?>
