@@ -197,12 +197,17 @@ class Assets_Pack_Admin {
         // TODO: needs to be proper url validating.
         $settings['assets_url'] = rtrim( $settings['assets_url'], '/' ) . '/';
         
-        $settings['skip_js'] = array_filter(
-            array_map( 'trim', explode( ',', $settings['skip_js'] ) )
-        );
-        $settings['skip_css'] = array_filter(
-            array_map( 'trim', explode( ',', $settings['skip_css'] ) )
-        );
+        if ( is_string( $settings['skip_js'] ) ) {
+            $settings['skip_js'] = array_filter(
+                array_map( 'trim', explode( ',', $settings['skip_js'] ) )
+            );
+        }
+
+        if ( is_string( $settings['skip_css'] ) ) {
+            $settings['skip_css'] = array_filter(
+                array_map( 'trim', explode( ',', $settings['skip_css'] ) )
+            );
+        }
 
         return $settings;
     }
@@ -248,6 +253,42 @@ class Assets_Pack_Admin {
         }
 
         return isset( $this->settings[$field] ) ? $this->settings[$field] : $default;
+    }
+    
+    /**
+     * Set setting field value.
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return true|string Success or validation error message.
+     */
+    public function set_setting( $field, $value ) {
+        global $wp_settings_errors;
+        
+        $settings = $this->get_setting();
+        if ( !isset( $settings[$field] ) ) {
+            return 'Setting field not registered.';
+        }
+
+        $settings[$field] = $value;
+
+        $settings = $this->validate_settings( $settings );
+
+        if ( !empty( $wp_settings_errors ) ) {
+            foreach ( $wp_settings_errors as $error ) {
+                if ( $error['setting'] === $field ) {
+                    return $error['message'];
+                }
+            }
+        }
+
+        // Update option in db.
+        update_option( 'assets_pack', $settings );
+        
+        // Update object settings.
+        $this->settings[$field] = $settings[$field];
+        
+        return true;
     }
     
     /**
