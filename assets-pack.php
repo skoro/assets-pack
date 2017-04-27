@@ -191,9 +191,9 @@ class Assets_Pack {
         
         $load = [];
         $skip = $this->admin->get_setting( 'skip_css' );
-        
+
         foreach ( $styles->to_do as $handle ) {
-        
+            
             if ( empty( $styles->registered[$handle] ) ) {
                 continue;
             }
@@ -202,7 +202,7 @@ class Assets_Pack {
             if ( in_array( $handle, $skip ) ) {
                 continue;
             }
-            
+
             /** @var $obj _WP_Dependency */
             if ( ! ( $obj = $styles->registered[$handle] ) ) {
                 continue;
@@ -210,14 +210,17 @@ class Assets_Pack {
             if ( ( $src = $this->get_dependency_src( $obj ) ) === false ) {
                 continue;
             }
-            
+
             if ( $this->is_conditional( $obj ) ) {
                 continue;
             }
-            
-            $load[$handle] = $src;
+
+            $load[$handle] = [
+                'src' => $src,
+                'args' => $obj->args,
+            ];
         }
-        
+
         if ( empty( $load ) ) {
             return;
         }
@@ -225,7 +228,7 @@ class Assets_Pack {
         if ( count( $load ) === 1 ) {
             return;
         }
-        
+
         $filename = $this->get_assets_key( array_keys( $load ) ) . '.css';
         if ( !$this->is_assets_exists( $filename ) &&
                 !$this->create_styles_assets( $filename, $load ) ) {
@@ -259,6 +262,10 @@ class Assets_Pack {
      */
     protected function get_dependency_src( $obj ) {
         $src = $obj->src;
+        
+        if ( $src[0] === '/' && $src[1] === '/' ) {
+            $src = ( is_ssl() ? 'https:' : 'http:' ) . $src;
+        }
         
         if ( $src[0] === '/' ) {
             return $src;
@@ -360,27 +367,33 @@ class Assets_Pack {
      * Create styles assets file.
      *
      * @param string $filename
-     * @param array $files List of style files.
+     * @param array $files List of style files with following keys:
+     * src and args.
      * @return bool
      */
     protected function create_styles_assets( $filename, $files ) {
         if ( ! ( $fh = $this->create_assets_file( $filename ) ) ) {
             return false;
         }
-        
-        foreach ( $files as $file ) {
-            $file_path = ABSPATH . $file;
+
+        $debug_files = [];
+        foreach ( $files as $handle => $file ) {
+            $file_path = ABSPATH . $file['src'];
+            $debug_files[$handle] = $file_path;
             // Skip already minified bundles.
             if ( substr( $file_path, -8 ) === '.min.css' ) {
                 $contents = file_get_contents( $file_path ) . "\n";
             } else {
                 $contents = $this->minify( $file_path, static::MIN_CSS );
             }
+            if ( $file['args'] !== 'all' ) {
+                $contents = "\n@media {$file['args']} {\n$contents\n}\n";
+            }
             fwrite( $fh, $contents );
         }
-        
+
         if ( $this->admin->get_setting( 'debug_css') ) {
-        	$this->create_debug( $filename, $files );
+            $this->create_debug( $filename, $debug_files );
         }
         
         return $this->unlock_file( $fh );
