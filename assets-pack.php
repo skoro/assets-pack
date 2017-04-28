@@ -285,6 +285,28 @@ class Assets_Pack {
         return $src;
     }
     
+    protected function get_local_src( $src ) {
+
+        if ( $src[0] === '/' && $src[1] === '/') {
+            $src = ( is_ssl() ? 'https:' : 'http:' ) . $src;
+        }
+        
+        if ( $src[0] === '/' ) {
+            return $src;
+        }
+        
+        if ( strpos( $src, $this->base_url ) !== 0 ) {
+            return false;
+        }
+
+        $src = str_replace( $this->base_url, '', $src );
+        if ( ( $pos = strpos( $src, '?' ) ) !== false ) {
+            $src = substr( $src, 0, $pos );
+        }
+
+        return $src;
+    }
+    
     /**
      * Get a unique key for handles.
      *
@@ -376,19 +398,29 @@ class Assets_Pack {
             return false;
         }
 
+        $convert_url = $this->admin->get_setting( 'css_inline_url' );
         $debug_files = [];
+
         foreach ( $files as $handle => $file ) {
+
             $file_path = ABSPATH . $file['src'];
             $debug_files[$handle] = $file_path;
+            
             // Skip already minified bundles.
             if ( substr( $file_path, -8 ) === '.min.css' ) {
                 $contents = file_get_contents( $file_path ) . "\n";
             } else {
                 $contents = $this->minify( $file_path, static::MIN_CSS );
             }
+
             if ( $file['args'] !== 'all' ) {
                 $contents = "\n@media {$file['args']} {\n$contents\n}\n";
             }
+
+            if ( $convert_url ) {
+                $contents = $this->replace_inline_urls( $contents, $file['src'] );
+            }
+
             fwrite( $fh, $contents );
         }
 
@@ -474,6 +506,38 @@ class Assets_Pack {
     	}
     	
     	return $this->unlock_file( $fh );
+    }
+    
+    /**
+     * Replace inline css url() values to local.
+     *
+     * @param string $text
+     * @param string $src
+     * @return string
+     */
+    protected function replace_inline_urls( $text, $src ) {
+        $dir = ABSPATH . dirname( $src );
+        return preg_replace_callback( '/url\((.+?)\)/',
+            function ( $matches ) use ( $dir ) {
+                $url = trim( $matches[1], '\'"' );
+                if ( substr( $url, 0, 5 ) === 'data:' ) {
+                    return $matches[0];
+                }
+                if ( ( $pos = strpos( $url, '?' ) ) !== false ) {
+                    $url = substr( $url, 0, $pos );
+                }
+                if ( ( $pos = strpos( $url, '#' ) ) !== false ) {
+                    $url = substr( $url, 0, $pos );
+                }
+                $file = $dir . '/' . $url;
+                if ( file_exists( $file ) ) {
+                    $file = str_replace( ABSPATH, '', realpath( $file ) );
+                    return 'url(' . $this->base_url . '/' . $file . ')';
+                }
+                return $matches[0];
+            },
+            $text
+        );
     }
 }
 
