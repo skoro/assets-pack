@@ -73,7 +73,8 @@ class Assets_Pack_Command extends WP_CLI_Command {
     /**
      * Clears assets.
      */
-    public function clear() {
+    public function clear( $args, $assoc_args ) {
+        WP_CLI::confirm( 'Are you sure you want to clear the assets ?', $assoc_args );
         $result = $this->admin->clear_assets();
         if ( $result ) {
             WP_CLI::success( 'Done!' );
