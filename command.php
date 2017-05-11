@@ -57,6 +57,7 @@ class Assets_Pack_Command extends WP_CLI_Command {
         WP_CLI::log( 'CSS aggregation: ' . $this->str_enabled( $this->admin->get_setting( 'enable_css' ) ) );
         WP_CLI::log( 'CSS debug: ' . $this->str_enabled( $this->admin->get_setting( 'debug_css' ) ) );
         WP_CLI::log( 'CSS skip: ' . $this->str_skip( $this->admin->get_setting( 'skip_css' ) ) );
+        WP_CLI::log( 'CSS inline url: ' . $this->str_enabled( $this->admin->get_setting( 'css_inline_url' ) ) );
     }
     
     /**
@@ -109,7 +110,7 @@ class Assets_Pack_Command extends WP_CLI_Command {
      * Show status or change styles aggregation.
      *
      * [--enable=<on|off>]
-     * : Enable of disable styles aggregation.
+     * : Enable or disable styles aggregation.
      * 
      * [--debug-info=<on|off>]
      * : Enable or disable debug mode.
@@ -117,12 +118,17 @@ class Assets_Pack_Command extends WP_CLI_Command {
      * [--skip=<styles>]
      * : Skip following styles on aggregation. Where <styles> is a list of style names
      * separated by commas. To clear skip list pass empty string: --skip=""
+     * 
+     * [--inline-url=<on|off>]
+     * : Enable or disable url links convertation inside "url()". Assets must
+     * be cleared after this setting is changed.
      */
     public function css( $args, $assoc_args ) {
 
         $this->change_option( 'enable_css', 'enable', $assoc_args );
         $this->change_option( 'debug_css', 'debug-info', $assoc_args );
         $this->change_option( 'skip_css', 'skip', $assoc_args );
+        $this->change_option( 'css_inline_url', 'inline-url', $assoc_args );
 
         $this->info_css();
     }
@@ -145,11 +151,12 @@ class Assets_Pack_Command extends WP_CLI_Command {
         switch ( $cmd_opt ) {
             case 'enable':
             case 'debug-info':
+            case 'inline-url':
                 if ( $value === 'on' || $value === 'off' ) {
                     $value = $value == 'on' ? true : false;
                     $status = $this->admin->set_setting( $option, $value );
                 } else {
-                    WP_CLI::error( 'Options "enable", "debug" accept only "on" or "off".' );
+                    WP_CLI::error( 'Option "' . $cmd_opt . '" accepts only "on" or "off" value.' );
                 }
                 break;
                 
