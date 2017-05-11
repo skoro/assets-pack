@@ -67,6 +67,7 @@ class Assets_Pack_Admin {
                 'debug_js' => false,
             	'skip_css' => [],
                 'enable_css' => false,
+                'css_inline_url' => false,
                 'debug_css' => false,
             ],
         ] );
@@ -86,6 +87,7 @@ class Assets_Pack_Admin {
         add_settings_section( 'css', 'CSS aggregation', '__return_false', $this->settings_page );
         add_settings_field( 'enable_css', 'CSS aggregation', [$this, 'field_enable_css'], $this->settings_page, 'css' );
         add_settings_field( 'skip_css', 'Skip styles', [$this, 'field_skip_css'], $this->settings_page, 'css' );
+        add_settings_field( 'css_inline_url', 'Convert inline urls', [$this, 'field_css_inline_url'], $this->settings_page, 'css' );
         add_settings_field( 'debug_css', 'Debug', [$this, 'field_debug_css'], $this->settings_page, 'css' );
     }
     
@@ -160,6 +162,16 @@ class Assets_Pack_Admin {
         <input type="text" name="assets_pack[assets_url]" value="<?= $this->get_setting( 'assets_url' ) ?>" size="64"/>
     <?php }
     
+    public function field_css_inline_url() { ?>
+        <label>
+            <input type="checkbox" name="assets_pack[css_inline_url]" value="true" <?php checked( $this->get_setting( 'css_inline_url' ) ) ?>/>
+            <?php esc_html_e( 'Convert all url() values to local if it possible.' ) ?>
+            <p class="description">
+                After this setting is checked or unchecked please clear assets.
+            </p>
+        </label>
+    <?php }
+    
     /**
      * Validate and sanitize settings.
      *
@@ -173,10 +185,11 @@ class Assets_Pack_Admin {
             return $this->get_setting();
         }
         
-        $settings['enable_js'] = !empty( $settings['enable_js'] );
-        $settings['debug_js'] = !empty( $settings['debug_js'] );
-        $settings['enable_css'] = !empty( $settings['enable_css'] );
-        $settings['debug_css'] = !empty( $settings['debug_css'] );
+        $settings['enable_js']      = !empty( $settings['enable_js'] );
+        $settings['debug_js']       = !empty( $settings['debug_js'] );
+        $settings['enable_css']     = !empty( $settings['enable_css'] );
+        $settings['debug_css']      = !empty( $settings['debug_css'] );
+        $settings['css_inline_url'] = !empty( $settings['css_inline_url'] );
         
         if ( !$settings['enable_js'] && $settings['debug_js'] ) {
             add_settings_error( 'debug_js', 'debug_js', 'Js debug is useless when js aggregation is disabled.' );
