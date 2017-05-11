@@ -62,10 +62,19 @@ class Assets_Pack_Command extends WP_CLI_Command {
     
     /**
      * Show plugin info.
+     * 
+     * [--assets-dir=<directory>]
+     * 
+     * [--assets-url=<url>]
      */
-    public function info() {
+    public function info( $args, $assoc_args ) {
+
+        $this->change_option( 'assets_dir', 'assets-dir', $assoc_args );
+        $this->change_option( 'assets_url', 'assets-url', $assoc_args );
+        
         WP_CLI::log( 'Assets dir: ' . $this->admin->get_setting( 'assets_dir' ) );
         WP_CLI::log( 'Assets url: ' . $this->admin->get_setting( 'assets_url' ) );
+
         $this->info_js();
         $this->info_css();
     }
@@ -162,6 +171,8 @@ class Assets_Pack_Command extends WP_CLI_Command {
                 break;
                 
             case 'skip':
+            case 'assets-dir':
+            case 'assets-url':
                 $status = $this->admin->set_setting( $option, $value );
                 break;
         }
