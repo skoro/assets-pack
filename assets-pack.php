@@ -17,7 +17,7 @@ require_once __DIR__ . '/admin.php';
 use MatthiasMullie\Minify;
 
 /**
- * Scripts and styles optimizer.
+ * Scripts and styles (assets) optimizer/aggregator.
  */
 class Assets_Pack {
     
@@ -264,7 +264,7 @@ class Assets_Pack {
     }
     
     /**
-     * Get dependency source without host name.
+     * Gets dependency source without host name.
      *
      * @param _WP_Dependency $obj
      * @return string|false
@@ -317,7 +317,7 @@ class Assets_Pack {
     }
     
     /**
-     * Get a unique key for handles.
+     * Gets a unique key for handles.
      *
      * @param array $handles
      * @return string
@@ -334,7 +334,7 @@ class Assets_Pack {
     }
     
     /**
-     * Initialize assets directory.
+     * Initializes assets directory.
      *
      * @throws RuntimeException When assets directory cannot be created.
      */
@@ -360,7 +360,7 @@ class Assets_Pack {
     }
     
     /**
-     * Create scripts assets file.
+     * Creates scripts assets file.
      *
      * @param string $filename Base file name.
      * @param array $assets Assets in form: group - files.
@@ -459,7 +459,7 @@ class Assets_Pack {
     }
     
     /**
-     * Create and lock assets file.
+     * Creates and locks assets file.
      *
      * @param string $filename
      * @return bool Returns false on create error or file locked.
@@ -478,7 +478,7 @@ class Assets_Pack {
     }
     
     /**
-     * Unlock file handle.
+     * Unlocks file handle.
      *
      * @param resource $fh
      * @return bool
@@ -490,7 +490,7 @@ class Assets_Pack {
     }
     
     /**
-     * Minify assets.
+     * Minifies assets.
      *
      * @param string $file
      * @param integer $min
@@ -515,7 +515,7 @@ class Assets_Pack {
     }
     
     /**
-     * Create debug file.
+     * Creates debug file.
      *
      * @param string $filename Debug file name.
      * @param array $data Debug contents.
@@ -535,7 +535,7 @@ class Assets_Pack {
     }
     
     /**
-     * Replace inline css url() values to local.
+     * Replaces inline css url() values to local.
      *
      * @param string $text
      * @param string $src
