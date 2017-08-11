@@ -7,6 +7,8 @@ Version: 0.1.0
 Author: Skorobogatko Alexei
 Author URI: https://github.com/skoro
 License: GPLv2
+Text Domain: assets-pack
+Domain Path: /languages
 */
 
 // Make sure we don't expose any info if it called directly.
@@ -581,7 +583,7 @@ else {
     if ( file_exists( $composer = __DIR__ . '/vendor/autoload.php' ) ) {
         require_once $composer;
     } else {
-        wp_die( __( '"Assets Pack" plugin Composer dependencies are missing. Please make sure that you are executed <strong>composer install</strong> command.' ) );
+        wp_die( __( '"Assets Pack" plugin Composer dependencies are missing. Please make sure that you are executed <strong>composer install</strong> command.', 'assets-pack' ) );
     }
 
     // Setup optimizer.
@@ -593,4 +595,12 @@ else {
             error_log( $e->getMessage() );
         }
     } );
+}
+
+/**
+ * Loads text domain for the plugin.
+ */
+add_action( 'plugins_loaded', 'assets_pack_load_text_domain' );
+function assets_pack_load_text_domain() {
+    load_plugin_textdomain( 'assets-pack', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }

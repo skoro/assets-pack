@@ -1,0 +1,156 @@
+# Copyright (C) 2017 Assets Pack
+# This file is distributed under the same license as the Assets Pack package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Assets Pack 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/assets-pack\n"
+"POT-Creation-Date: 2017-08-11 09:38:16+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2017-08-11 14:34+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"X-Generator: Poedit 1.5.4\n"
+"Language: en\n"
+
+#. #-#-#-#-#  assets-pack.pot (Assets Pack 0.1.0)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: admin.php:46
+msgid "Assets Pack"
+msgstr "Агрегация и минимизация"
+
+#: admin.php:47
+msgid "Assets"
+msgstr "Фронтэнд"
+
+#: admin.php:77
+msgid "Assets store location"
+msgstr "Каталог размещения итоговых файлов"
+
+#: admin.php:78
+msgid "Assets URL"
+msgstr "URL по которому будут доступны итоговые файлы"
+
+#: admin.php:81 admin.php:82
+msgid "JavaScript aggregation"
+msgstr "Агрегация и сжатие скриптов"
+
+#: admin.php:83
+msgid "Skip scripts"
+msgstr "Игнорировать скрипты"
+
+#: admin.php:84 admin.php:91
+msgid "Debug"
+msgstr "Отладка"
+
+#: admin.php:87 admin.php:88
+msgid "CSS aggregation"
+msgstr "CSS агрегация и сжатие"
+
+#: admin.php:89
+msgid "Skip styles"
+msgstr "Игнорировать стили"
+
+#: admin.php:90
+msgid "Convert inline urls"
+msgstr "Преобразовать внутренние ссылки"
+
+#: admin.php:103
+msgid "Update settings"
+msgstr "Сохранить настройки"
+
+#: admin.php:111
+msgid ""
+"Do not include these scripts to assets file. You should enter handle names "
+"separated by commas. You can get names from a .js.debug file."
+msgstr ""
+"Не включать эти скрипты в итоговый файл. Нужно ввести внутренние названия "
+"скриптов через запятую. Эти названия можно увидеть в файле .js.debug"
+
+#: admin.php:118
+msgid ""
+"Enabling aggregation all javascripts will concatenated to one asset bundle."
+msgstr "Собрать все скрипты в один файл."
+
+#: admin.php:125
+msgid ""
+"Do not include these styles to assets file. You should enter handle names "
+"separated by commas. You can get names from a .css.debug file."
+msgstr ""
+"Не включать эти стили в итоговый файл. Нужно ввести внутренние названия "
+"стилей через запятую. Эти названия можно увидеть в файле .css.debug"
+
+#: admin.php:132
+msgid ""
+"Enabling aggregation all CSS styles will concatenated to one asset bundle."
+msgstr "Собрать все стили в один файл."
+
+#: admin.php:139
+msgid ""
+"Create along with js asset file with .js.debug extension which contains "
+"script names."
+msgstr ""
+"Создавать .js.debug файл с названиями скриптов и их путями которые вошли в "
+"итоговый файл."
+
+#: admin.php:146
+msgid ""
+"Create along with css asset file with .css.debug extension which contains "
+"styles names."
+msgstr ""
+"Создавать .css.debug файл с названиями стилей и их путями которые вошли в "
+"итоговый файл."
+
+#: admin.php:153
+msgid "Clear assets"
+msgstr "Очистить результаты агрегации"
+
+#: admin.php:164
+msgid "Convert all url() values to local if it possible."
+msgstr ""
+"Преобразовать все url() в правилах стилей в локальные если это возможно."
+
+#: admin.php:166
+msgid "After this setting is checked or unchecked please clear assets."
+msgstr "После включения этой опции нужно очистить файлы агрегации."
+
+#: admin.php:180
+msgid "Assets has been clean."
+msgstr "Файлы агрегации очищены."
+
+#: admin.php:191
+msgid "Js debug is useless when js aggregation is disabled."
+msgstr "Отладка скриптов бесполезна когда агрегация скриптов отключена."
+
+#: admin.php:195
+msgid "Css debug is useless when css aggregation is disabled."
+msgstr "Отладка Css бесполезна когда агрегация стилей отключена."
+
+#: admin.php:201
+msgid "Could not create directory or directory is not writeable."
+msgstr "Не удалось создать каталог или каталог недоступен для записи."
+
+#: assets-pack.php:586
+msgid ""
+"\"Assets Pack\" plugin Composer dependencies are missing. Please make sure "
+"that you are executed <strong>composer install</strong> command."
+msgstr ""
+"Не найдены зависимости плагина \"Assets Pack\". Проверьте, пожалуйста, что "
+"вы выполнили команду <strong>composer install</strong> в каталоге плагина."
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/skoro/assets-pack"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Aggregate and minimize javascripts and css."
+msgstr "Агрегация и минимизация скриптов и стилей."
+
+#. Author of the plugin/theme
+msgid "Skorobogatko Alexei"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://github.com/skoro"
+msgstr ""
