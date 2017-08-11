@@ -172,10 +172,14 @@ class Assets_Pack {
             $handles = array_merge( $handles, array_keys( $group ) );
         }
         
-        $filename = $this->get_assets_key( $handles ) . '.js';
-        if ( !$this->is_assets_exists( $filename ) &&
-                !$this->create_scripts_assets( $filename, $this->script_assets ) ) {
+        $filename  = $this->get_assets_key( $handles ) . '.js';
+        $debugname = $filename . '.debug';
+        if ( ! $this->is_assets_exists( $filename ) &&
+                ! $this->create_scripts_assets( $filename, $this->script_assets ) ) {
             return;
+        }
+        if ( $this->admin->get_setting( 'debug_js' ) && ! $this->is_assets_exists( $debugname ) ) {
+            $this->create_scripts_debug( $debugname );
         }
         
         $url = $this->assets_url . $filename;
@@ -229,10 +233,15 @@ class Assets_Pack {
             return;
         }
 
-        $filename = $this->get_assets_key( array_keys( $load ) ) . '.css';
-        if ( !$this->is_assets_exists( $filename ) &&
-                !$this->create_styles_assets( $filename, $load ) ) {
+        $filename  = $this->get_assets_key( array_keys( $load ) ) . '.css';
+        $debugname = $filename . '.debug';
+        if ( ! $this->is_assets_exists( $filename ) &&
+                ! $this->create_styles_assets( $filename, $load ) ) {
             return;
+        }
+        if ( $this->admin->get_setting( 'debug_css' ) &&
+                ! $this->is_assets_exists( $debugname ) ) {
+            $this->create_styles_debug( $debugname, $load );
         }
         
         $url = $this->assets_url . $filename;
@@ -363,7 +372,6 @@ class Assets_Pack {
             return false;
         }
         
-        $debug_data = [];
         foreach ( $assets as $group => $files ) {
             foreach ( (array) $files as $handle => $file ) {
                 $file_path = ABSPATH . $file;
@@ -374,15 +382,27 @@ class Assets_Pack {
                     $contents = $this->minify( $file_path, static::MIN_JS );
                 }
                 fwrite( $fh, $contents . "\n\n;" );
-                $debug_data[$handle] = $file;
             }
         }
         
-        if ( $this->admin->get_setting( 'debug_js' ) ) {
-        	$this->create_debug( $filename, $debug_data );
+        return $this->unlock_file( $fh );
+    }
+    
+    /**
+     * Creates scripts debug file.
+     *
+     * @param string $filename Scripts debug file name.
+     */
+    protected function create_scripts_debug( $filename ) {
+        $debug = [];
+        
+        foreach ( $this->script_assets as $group => $files ) {
+            foreach ( (array) $files as $handle => $file ) {
+                $debug[$handle] = $file;
+            }
         }
         
-        return $this->unlock_file( $fh );
+        $this->create_debug( $filename, $debug );
     }
     
     /**
@@ -399,12 +419,10 @@ class Assets_Pack {
         }
 
         $convert_url = $this->admin->get_setting( 'css_inline_url' );
-        $debug_files = [];
 
         foreach ( $files as $handle => $file ) {
 
             $file_path = ABSPATH . $file['src'];
-            $debug_files[$handle] = $file_path;
             
             // Skip already minified bundles.
             if ( substr( $file_path, -8 ) === '.min.css' ) {
@@ -424,11 +442,20 @@ class Assets_Pack {
             fwrite( $fh, $contents );
         }
 
-        if ( $this->admin->get_setting( 'debug_css') ) {
-            $this->create_debug( $filename, $debug_files );
-        }
-        
         return $this->unlock_file( $fh );
+    }
+    
+    /**
+     * Creates styles debug file.
+     *
+     * @param string $filename Debug file name.
+     * @param array $files Style files.
+     */
+    protected function create_styles_debug( $filename, $files ) {
+        $files = array_map( function ( $file ) {
+            return ABSPATH . ltrim( $file['src'], '/' );
+        }, $files );
+        $this->create_debug( $filename, $files );
     }
     
     /**
@@ -490,12 +517,11 @@ class Assets_Pack {
     /**
      * Create debug file.
      *
-     * @param string $filename Debug file name (full path without .debug extension).
+     * @param string $filename Debug file name.
      * @param array $data Debug contents.
      * @return bool
      */
     protected function create_debug( $filename, array $data ) {
-    	$filename .= '.debug';
     	
     	if ( ( $fh = $this->create_assets_file( $filename ) ) === false ) {
     		return false;
