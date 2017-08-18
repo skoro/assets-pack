@@ -3,7 +3,7 @@
 /**
  * Plugin uninstall.
  * 
- * Removes styles and scripts bundles from the assets directory.
+ * Removes style and script bundles from the assets directory.
  * Removes the assets directory itself.
  * Removes the plugin options.
  */
