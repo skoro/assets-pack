@@ -261,6 +261,7 @@ class Assets_Pack_Admin {
             return $this->settings;
         }
 
+        // FIXME: php7.x: $this->settings[$field] ?: $default;
         return isset( $this->settings[$field] ) ? $this->settings[$field] : $default;
     }
     
