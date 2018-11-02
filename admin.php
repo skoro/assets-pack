@@ -78,17 +78,25 @@ class Assets_Pack_Admin {
         add_settings_field( 'assets_url', __( 'Bundles URL', 'assets-pack' ), [$this, 'field_assets_url'], $this->settings_page, 'main' );
         
         // Javascript options.
-        add_settings_section( 'js', __( 'JavaScript', 'assets-pack' ), '__return_false', $this->settings_page );
+        add_settings_section( 'js', __( 'JavaScript', 'assets-pack' ), [$this, 'hr'], $this->settings_page );
         add_settings_field( 'enable_js', '', [$this, 'field_enable_js'], $this->settings_page, 'js' );
         add_settings_field( 'skip_js', __( 'Skip these scripts', 'assets-pack' ), [$this, 'field_skip_js'], $this->settings_page, 'js' );
         add_settings_field( 'debug_js', __( 'Debug', 'assets-pack' ), [$this, 'field_debug_js'], $this->settings_page, 'js' );
         
         // CSS options.
-        add_settings_section( 'css', __( 'CSS', 'assets-pack' ), '__return_false', $this->settings_page );
+        add_settings_section( 'css', __( 'CSS', 'assets-pack' ), [$this, 'hr'], $this->settings_page );
         add_settings_field( 'enable_css', '', [$this, 'field_enable_css'], $this->settings_page, 'css' );
         add_settings_field( 'skip_css', __( 'Skip these styles', 'assets-pack' ), [$this, 'field_skip_css'], $this->settings_page, 'css' );
         add_settings_field( 'css_inline_url', __( 'Convert inline urls', 'assets-pack' ), [$this, 'field_css_inline_url'], $this->settings_page, 'css' );
         add_settings_field( 'debug_css', __( 'Debug', 'assets-pack' ), [$this, 'field_debug_css'], $this->settings_page, 'css' );
+    }
+
+    /**
+     * Just a horizontal line.
+     * For sections separation.
+     */
+    public function hr() {
+        echo '<hr>';
     }
     
     /**
