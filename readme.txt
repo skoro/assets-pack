@@ -6,11 +6,16 @@ Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Allows to aggregate scripts and styles into assets. Supports minification.
+This plugin allows you to combine javascripts scripts and css styles into bundles.
 
 == Description ==
 
-This plugin can include many scripts (js) and styles (css) into two assets files.
+This plugin helps you to increase network performace on your site. As you can see
+in browser's network inspector a general page can contains a lot of resources
+such as javascripts (jquery, sliders, so on) and styles. Each time those resources
+are pulled from a server and increase the whole time of page loading.
+This plugin will combine them into one bundle for javascripts and one bundle for
+css styles. And instead of loading lots of resources you only need two those bundles.
 
 == Installation ==
 
@@ -23,10 +28,10 @@ OR you can just install it with WordPress by going to Plugins >> Add New >> and 
 
 == Frequently Asked Questions ==
 
-= Can I skip some scripts or styles into including ? =
+= Can I skip some scripts or styles into combining ? =
 
 Yes. You may enter script/style name in assets settings plugin page. For example,
-"jquery-core" means ignore including jquery.js into assets.
+"jquery-core" means ignore including jquery.js into bundle.
 
 = How can I know which script/style name ? =
 

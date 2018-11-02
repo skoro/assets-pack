@@ -74,19 +74,19 @@ class Assets_Pack_Admin {
 
         // Main options.
         add_settings_section( 'main', '', '__return_false', $this->settings_page );
-        add_settings_field( 'assets_dir', __( 'Assets store location', 'assets-pack' ), [$this, 'field_assets_store'], $this->settings_page, 'main' );
-        add_settings_field( 'assets_url', __( 'Assets URL', 'assets-pack' ), [$this, 'field_assets_url'], $this->settings_page, 'main' );
+        add_settings_field( 'assets_dir', __( 'Bundles directory', 'assets-pack' ), [$this, 'field_assets_store'], $this->settings_page, 'main' );
+        add_settings_field( 'assets_url', __( 'Bundles URL', 'assets-pack' ), [$this, 'field_assets_url'], $this->settings_page, 'main' );
         
         // Javascript options.
-        add_settings_section( 'js', __( 'JavaScript aggregation', 'assets-pack' ), '__return_false', $this->settings_page );
-        add_settings_field( 'enable_js', __( 'JavaScript aggregation', 'assets-pack' ), [$this, 'field_enable_js'], $this->settings_page, 'js' );
-        add_settings_field( 'skip_js', __( 'Skip scripts', 'assets-pack' ), [$this, 'field_skip_js'], $this->settings_page, 'js' );
+        add_settings_section( 'js', __( 'JavaScript', 'assets-pack' ), '__return_false', $this->settings_page );
+        add_settings_field( 'enable_js', '', [$this, 'field_enable_js'], $this->settings_page, 'js' );
+        add_settings_field( 'skip_js', __( 'Skip these scripts', 'assets-pack' ), [$this, 'field_skip_js'], $this->settings_page, 'js' );
         add_settings_field( 'debug_js', __( 'Debug', 'assets-pack' ), [$this, 'field_debug_js'], $this->settings_page, 'js' );
         
         // CSS options.
-        add_settings_section( 'css', __( 'CSS aggregation', 'assets-pack' ), '__return_false', $this->settings_page );
-        add_settings_field( 'enable_css', __( 'CSS aggregation', 'assets-pack' ), [$this, 'field_enable_css'], $this->settings_page, 'css' );
-        add_settings_field( 'skip_css', __( 'Skip styles', 'assets-pack' ), [$this, 'field_skip_css'], $this->settings_page, 'css' );
+        add_settings_section( 'css', __( 'CSS', 'assets-pack' ), '__return_false', $this->settings_page );
+        add_settings_field( 'enable_css', '', [$this, 'field_enable_css'], $this->settings_page, 'css' );
+        add_settings_field( 'skip_css', __( 'Skip these styles', 'assets-pack' ), [$this, 'field_skip_css'], $this->settings_page, 'css' );
         add_settings_field( 'css_inline_url', __( 'Convert inline urls', 'assets-pack' ), [$this, 'field_css_inline_url'], $this->settings_page, 'css' );
         add_settings_field( 'debug_css', __( 'Debug', 'assets-pack' ), [$this, 'field_debug_css'], $this->settings_page, 'css' );
     }
@@ -108,14 +108,14 @@ class Assets_Pack_Admin {
     public function field_skip_js() { ?>
     	<input type="text" name="assets_pack[skip_js]" value="<?= esc_attr( implode( ',', $this->get_setting( 'skip_js', [] ) ) ) ?>" size="64"/>
     	<p class="description">
-            <?php esc_html_e( 'Do not include these scripts to assets file. You should enter handle names separated by commas. You can get names from a .js.debug file.', 'assets-pack' ) ?>
+            <?php esc_html_e( 'Do not include these scripts into a bundle file. You should enter handle names separated by commas. You can get names from a .js.debug file.', 'assets-pack' ) ?>
         </p>
     <?php }
     
     public function field_enable_js() { ?>
         <label>
             <input type="checkbox" name="assets_pack[enable_js]" value="true" <?php checked( $this->get_setting( 'enable_js' ) ) ?>/>
-            <?php esc_html_e( 'Enabling aggregation all javascripts will concatenated to one asset bundle.', 'assets-pack' ) ?>
+            <?php esc_html_e( 'Combine javascripts into a bundle', 'assets-pack' ) ?>
         </label>
     <?php }
     
@@ -129,28 +129,28 @@ class Assets_Pack_Admin {
     public function field_enable_css() { ?>
         <label>
             <input type="checkbox" name="assets_pack[enable_css]" value="true" <?php checked( $this->get_setting( 'enable_css' ) ) ?>/>
-            <?php esc_html_e( 'Enabling aggregation all CSS styles will concatenated to one asset bundle.', 'assets-pack' ) ?>
+            <?php esc_html_e( 'Combine styles into a bundle', 'assets-pack' ) ?>
         </label>
     <?php }
     
     public function field_debug_js() { ?>
         <label>
             <input type="checkbox" name="assets_pack[debug_js]" value="true" <?php checked( $this->get_setting( 'debug_js') ) ?>/>
-            <?php esc_html_e( 'Create along with js asset file with .js.debug extension which contains script names.', 'assets-pack' ) ?>
+            <?php esc_html_e( 'Create a debug file with script names which contains in a bundle', 'assets-pack' ) ?>
         </label>
     <?php }
     
     public function field_debug_css() { ?>
         <label>
             <input type="checkbox" name="assets_pack[debug_css]" value="true" <?php checked( $this->get_setting( 'debug_css' ) ) ?>/>
-            <?php esc_html_e( 'Create along with css asset file with .css.debug extension which contains styles names.', 'assets-pack' ) ?>
+            <?php esc_html_e( 'Create a debug file with style names which contains in a bundle', 'assets-pack' ) ?>
         </label>
     <?php }
     
     public function field_assets_store() { ?>
         <input type="text" name="assets_pack[assets_dir]" value="<?= $this->get_setting( 'assets_dir' ) ?>" size="64"/>
         <p>
-            <button name="clear" class="button"><?php esc_html_e( 'Clear assets', 'assets-pack' ) ?></button>
+            <button name="clear" class="button"><?php esc_html_e( 'Clear cache', 'assets-pack' ) ?></button>
         </p>
     <?php }
     
@@ -161,9 +161,9 @@ class Assets_Pack_Admin {
     public function field_css_inline_url() { ?>
         <label>
             <input type="checkbox" name="assets_pack[css_inline_url]" value="true" <?php checked( $this->get_setting( 'css_inline_url' ) ) ?>/>
-            <?php esc_html_e( 'Convert all url() values to local if it possible.', 'assets-pack' ) ?>
+            <?php esc_html_e( 'Convert all url() values to local if it possible', 'assets-pack' ) ?>
             <p class="description">
-                <?php esc_html_e( 'After this setting is checked or unchecked please clear assets.', 'assets-pack' ) ?>
+                <?php esc_html_e( 'Always clear cache if this setting is changed.', 'assets-pack' ) ?>
             </p>
         </label>
     <?php }
@@ -177,7 +177,7 @@ class Assets_Pack_Admin {
     public function validate_settings( $settings ) {
         if ( isset( $_POST['clear'] ) ) {
             $this->clear_assets();
-            add_settings_error( 'assets_dir', 'success', __( 'Assets has been clean.', 'assets-pack' ), 'updated' );
+            add_settings_error( 'assets_dir', 'success', __( 'Cached bundles has been removed.', 'assets-pack' ), 'updated' );
             return $this->get_setting();
         }
         

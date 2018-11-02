@@ -2,7 +2,7 @@
 /*
 Plugin Name: Assets Pack
 Plugin URI: https://github.com/skoro/assets-pack
-Description: Aggregate and minimize javascripts and css.
+Description: Combine and minimize javascripts and css.
 Version: 0.1.0
 Author: Skorobogatko Alexei
 Author URI: https://github.com/skoro
@@ -19,7 +19,7 @@ require_once __DIR__ . '/admin.php';
 use MatthiasMullie\Minify;
 
 /**
- * Scripts and styles (assets) optimizer/aggregator.
+ * Scripts and styles (assets) optimizer/combiner.
  */
 class Assets_Pack {
     
